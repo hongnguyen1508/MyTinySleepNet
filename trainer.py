@@ -19,8 +19,8 @@ def run(db, gpu, from_fold, to_fold, suffix='', random_seed=42):
     # Output directory
     output_dir = f'out_{db}{suffix}'
 
-    assert from_fold <= to_fold
-    assert to_fold < config.params['n_folds']
+    # assert from_fold <= to_fold
+    # assert to_fold < config.params['n_folds']
 
     # Training
     for fold_idx in range(from_fold, to_fold+1):

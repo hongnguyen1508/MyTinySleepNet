@@ -32,6 +32,8 @@ def train(
     restart=False,
     random_seed=42,
 ):
+    print("config")
+
     spec = importlib.util.spec_from_file_location("*", config_file)
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
@@ -52,60 +54,75 @@ def train(
 
     subject_files = glob.glob(os.path.join(config["data_dir"], "*.npz"))
 
-    # Load subject IDs
-    fname = "{}.txt".format(config["dataset"])
-    seq_sids = load_seq_ids(fname)
-    logger.info("Load generated SIDs from {}".format(fname))
-    logger.info("SIDs ({}): {}".format(len(seq_sids), seq_sids))
+    # # Load subject IDs
+    # fname = "/content/drive/MyDrive/tinysleepnet/{}.txt".format(config["dataset"])
+    # seq_sids = load_seq_ids(fname)
+    # logger.info("Load generated SIDs from {}".format(fname))
+    # logger.info("SIDs ({}): {}".format(len(seq_sids), seq_sids))
 
-    # Split training and test sets
-    fold_pids = np.array_split(seq_sids, config["n_folds"])
+    # # Split training and test sets
+    # fold_pids = np.array_split(seq_sids, config["n_folds"])
 
-    test_sids = fold_pids[fold_idx]
-    train_sids = np.setdiff1d(seq_sids, test_sids)
+    # test_sids = fold_pids[fold_idx]
+    # train_sids = np.setdiff1d(seq_sids, test_sids)
 
-    # Further split training set as validation set (10%)
-    n_valids = round(len(train_sids) * 0.10)
+    # # Further split training set as validation set (10%)
+    # n_valids = round(len(train_sids) * 0.10)
 
-    # Set random seed to control the randomness
-    np.random.seed(random_seed)
-    valid_sids = np.random.choice(train_sids, size=n_valids, replace=False)
-    train_sids = np.setdiff1d(train_sids, valid_sids)
+    # # Set random seed to control the randomness
+    # np.random.seed(random_seed)
+    # valid_sids = np.random.choice(train_sids, size=n_valids, replace=False)
+    # train_sids = np.setdiff1d(train_sids, valid_sids)
 
-    logger.info("Train SIDs: ({}) {}".format(len(train_sids), train_sids))
-    logger.info("Valid SIDs: ({}) {}".format(len(valid_sids), valid_sids))
-    logger.info("Test SIDs: ({}) {}".format(len(test_sids), test_sids))
+    # logger.info("Train SIDs: ({}) {}".format(len(train_sids), train_sids))
+    # logger.info("Valid SIDs: ({}) {}".format(len(valid_sids), valid_sids))
+    # logger.info("Test SIDs: ({}) {}".format(len(test_sids), test_sids))
 
     # Get corresponding files
+    # for sid in train_sids:
+    #     train_files.append(get_subject_files(
+    #         dataset=config["dataset"],
+    #         files=  ,
+    #         sid=sid,
+    #     ))
     train_files = []
-    for sid in train_sids:
-        train_files.append(get_subject_files(
-            dataset=config["dataset"],
-            files=subject_files,
-            sid=sid,
-        ))
+    train_files = glob.glob(os.path.join("data/physionet_sleep/train", "*.npz"))
     train_files = np.hstack(train_files)
     train_x, train_y, _ = load_data(train_files)
 
-    valid_files = []
-    for sid in valid_sids:
-        valid_files.append(get_subject_files(
-            dataset=config["dataset"],
-            files=subject_files,
-            sid=sid,
-        ))
-    valid_files = np.hstack(valid_files)
-    valid_x, valid_y, _ = load_data(valid_files)
+    val_files = []
+    val_files = glob.glob(os.path.join("data/physionet_sleep/val", "*.npz"))
+    val_files = np.hstack(val_files)
+    valid_x, valid_y, _ = load_data(val_files)
+    # for sid in valid_sids:
+    #     valid_files.append(get_subject_files(
+    #         dataset=config["dataset"],
+    #         files=subject_files,
+    #         sid=sid,
+    #     ))
+    # valid_files = np.hstack(valid_files)
+    # valid_x, valid_y, _ = load_data(valid_files)
 
     test_files = []
-    for sid in test_sids:
-        test_files.append(get_subject_files(
-            dataset=config["dataset"],
-            files=subject_files,
-            sid=sid,
-        ))
-    test_files = np.hstack(test_files)
+    test_files = glob.glob(os.path.join("data/physionet_sleep/test", "*.npz"))
+    test_files = np.hstack(test_files)[:-1]
     test_x, test_y, _ = load_data(test_files)
+    # for sid in test_sids:
+    #     test_files.append(get_subject_files(
+    #         dataset=config["dataset"],
+    #         files=subject_files,
+    #         sid=sid,
+    #     ))
+    # test_files = np.hstack(test_files)
+    # test_x, test_y, _ = load_data(test_files)
+
+
+
+    print("train_files\n", train_files)
+    print("\n\ntest_files\n", test_files)
+    print("\n\nval_files\n", val_files)
+
+
 
     # Print training, validation and test sets
     logger.info("Training set (n_night_sleeps={})".format(len(train_y)))
@@ -390,10 +407,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config_file", type=str, required=True)
     parser.add_argument("--fold_idx", type=int, required=True)
-    parser.add_argument("--output_dir", type=str, default="./output/train")
+    parser.add_argument("--output_dir", type=str, default="/output/train")
     parser.add_argument("--restart", dest="restart", action="store_true")
     parser.add_argument("--no-restart", dest="restart", action="store_false")
-    parser.add_argument("--log_file", type=str, default="./output/output.log")
+    parser.add_argument("--log_file", type=str, default="/output/output.log")
     parser.add_argument("--random_seed", type=int, default=42)
     parser.set_defaults(restart=False)
     args = parser.parse_args()

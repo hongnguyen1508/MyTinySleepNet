@@ -23,9 +23,9 @@ params = {
 
     # Dataset
     "dataset": "sleepedfx",
-    "data_dir": "./data/sleepedf/sleep-cassette/eeg_fpz_cz",
-    "n_folds": 10,
-    "n_subjects": 78,
+    "data_dir": "data/physionet_sleep/train",
+    "n_folds": 20,
+    "n_subjects": 20,
 
     # Data Augmentation
     "augment_seq": True,
