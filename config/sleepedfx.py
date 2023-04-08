@@ -24,7 +24,7 @@ params = {
     # Dataset
     "dataset": "sleepedfx",
     "data_dir": "data/physionet_sleep/train",
-    "n_folds": 20,
+    "n_folds": 1,
     "n_subjects": 20,
 
     # Data Augmentation
